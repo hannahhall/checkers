@@ -4,10 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
-import { } from 'css-loader';
 
 import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
+import { AuthService } from '../providers/providers';
 
 
 @NgModule({
@@ -21,7 +21,9 @@ import { environment } from '../environments/environment';
     AngularFireDatabaseModule,
     AngularFireAuthModule
   ],
-  providers: [],
+  providers: [
+    AuthService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
