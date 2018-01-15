@@ -17,7 +17,7 @@
             <div class="piece white dashPieceW king"></div>
         </div>
         <div *ngFor="let game of games" (click)="joinGame(game.$key)" class="dashGame" [ngClass]="game.player2 || (game.player1 == uid) ? 'closed' : 'open'">
-            <p *ngIf="game.player1 != uid">
+            <p *ngIf="game.player1 != uid && !game.player2">
                 <span>J</span>oin
                 <span>G</span>ame
             </p>
