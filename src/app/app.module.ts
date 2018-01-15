@@ -8,12 +8,12 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
-import { AuthService } from '../providers/providers';
+import { AuthService, DashboardService, GameService } from '../providers/providers';
 import { DashboardComponent, GameComponent, LoginComponent } from '../components/components';
 
 const appRoutes: Routes = [
   { path: 'dashboard/:uid', component: DashboardComponent },
-  { path: 'checkers/:gid', component: GameComponent },
+  { path: 'game/:gid', component: GameComponent },
   { path: '', component: LoginComponent },
   { path: '**', component: LoginComponent }
 ];
@@ -37,7 +37,9 @@ const appRoutes: Routes = [
     )
   ],
   providers: [
-    AuthService
+    AuthService,
+    DashboardService,
+    GameService
   ],
   bootstrap: [AppComponent]
 })
