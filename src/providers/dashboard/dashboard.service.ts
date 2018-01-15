@@ -24,29 +24,9 @@ export class DashboardService {
 
   createNewGame(game) {
     return this.gamesDb.push(game);
-    // firebase.database().ref('games/').push({
-    //
-    // }).then((game) => {
-    //
-    //   $timeout();
-    // });
   }
 
-  joinGame() {
-    // firebase.database().ref(`games/${gameId}`).update({
-    //   player2: uid,
-    //   player2Email: userEmail
-    // });
-    // HelperFact.createPlayer2(gameId, uid);
-    // $location.path(`checkers/${gameId}`);
+  joinGame(gameId, data) {
+    return this.db.object(`games/${gameId}`).update(data);
   }
-
-  createPlayer1(gameKey, uid) {
-
-  }
-
-  createPlayer2(gameKey, uid) {
-
-  }
-
 }
