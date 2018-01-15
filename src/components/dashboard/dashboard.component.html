@@ -1,3 +1,38 @@
-<p>
-  dashboard works!
-</p>
+<div class="dashContainer">
+    <div class="navBar">
+        <h1 class="dashHead">Checkers</h1>
+        <h2 class="dashHead small">{{heading}}</h2>
+        <button type="submit" (click)="logOut()" class="dashLogout btn btn-default">Logout</button>
+        <a href="https://github.com/hannahhall/checkers" target="_blank" class="github">
+            <img src="assets/img/GitHub-Mark-Light-32px.png" alt="GitHub Link">
+        </a>
+    </div>
+    <div class="gameContain">
+        <div class="dashGame newGame" (click)="newGame()">
+            <p>
+                <span>C</span>reate
+                <span>N</span>ew
+                <span>G</span>ame</p>
+            <div class="piece red dashPiece"></div>
+            <div class="piece white dashPieceW king"></div>
+        </div>
+        <div *ngFor="let game of games" (click)="joinGame(game.$key)" class="dashGame" [ngClass]="game.player2 || (game.player1 == uid) ? 'closed' : 'open'">
+            <p *ngIf="game.player1 != uid">
+                <span>J</span>oin
+                <span>G</span>ame
+            </p>
+            <p *ngIf="game.player1 == uid && !game.player2">
+                <span>W</span>ait for another player
+            </p>
+            <p *ngIf="game.player2">
+                <span>G</span>ame in progress
+            </p>
+            <p>Player 1: {{game.player1Email}}</p>
+            <p *ngIf='game.player2'>
+                Player 2: {{game.player2Email}}
+            </p>
+            <div class="piece red dashPiece"></div>
+            <div class="piece white dashPieceW king"></div>
+        </div>
+    </div>
+</div>
