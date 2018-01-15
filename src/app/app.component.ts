@@ -11,5 +11,13 @@ import { Router } from '@angular/router';
 })
 export class AppComponent {
 
-  constructor() { }
+  constructor(public afAuth: AngularFireAuth, private router: Router) {
+    this.afAuth.authState.subscribe((user) => {
+      if (user) {
+        this.router.navigate([`dashboard/${user.uid}`]);
+      } else {
+        this.router.navigate(['']);
+      }
+    });
+  }
 }
