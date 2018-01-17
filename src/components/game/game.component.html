@@ -1,3 +1,54 @@
-<p>
-  game works!
-</p>
+<div id="game">
+    <div class="overlay" *ngIf="player1Death === 8 || player2Death === 8">
+        <div class="results">
+            <p *ngIf="player1Death === 8">{{player2Email}} wins</p>
+            <p *ngIf="player2Death === 8"> {{player1Email}} Wins</p>
+            <button type="button" (click)="reset()">Play Again?</button>
+        </div>
+    </div>
+    <div class="gameNavBar">
+        <h1 class="gameHead">Checkers</h1>
+        <button type="button" (click)="leaveGame()" class="btn btn-default gameBtn btnLeft">Leave Game</button>
+        <button type="submit" (click)="logOut()" class="btn btn-default gameBtn">Logout</button>
+        <a href="https://github.com/hannahhall/checkers" target="_blank" class="github">
+            <img src="assets/img/GitHub-Mark-Light-32px.png" alt="GitHub Link">
+        </a>
+    </div>
+    <div class="gameContainer">
+        <div class="player">
+            <p>Welcome {{userEmail}}</p>
+            <div>
+                <div [ngClass]="playerColor === 'red' ? 'loginPieceR' : 'loginPieceW'"></div>
+            </div>
+            <p *ngIf="playerColor === 'red'">Score: {{player2Death}}</p>
+            <p *ngIf="playerColor === 'white'">Score: {{player1Death}}</p>
+        </div>
+        <div id="board">
+            <div *ngFor="let square of board" id="{{index}}" [ngClass]="chckBrd(square.x, square.y) ? 'squareBlack' : 'square'"
+                (click)="chooseSquare(square)">
+            </div>
+            <div id="pieces">
+                <div *ngFor="let piece of pieces" class="piece {{piece.color}}" id="{{piece.id}}" [ngStyle]="{
+						'top': piece.top,
+						'left': piece.left
+					}" (click)="piece.king ? chooseKing($event, piece, piece.id) : piece.player1 ? choosePiecePlayer1($event, piece, piece.id) : choosePiecePlayer2($event, piece, piece.id)"
+                    [ngClass]="piece.king ? 'king': 'none'">
+                </div>
+            </div>
+            <div [ngClass]="turn === userId ? 'hide' : 'disabled'">
+            </div>
+        </div>
+        <div class="messageBoard">
+            <div class="messageArea">
+                <!-- !!!!!!! Messages -->
+                <!-- <p *ngFor="let message of messages">{{message.userEmail}}: {{message.userMessage}}</p> -->
+            </div>
+            <form class="form-inline messageInput">
+                <div class="form-group">
+                    <input type="text" name="" value="" class="form-control" placeholder="Enter message here:" ng-model="message">
+                    <input type="submit" name="" class="btn btn-default messageBtn" (click)="submitMessage()">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
