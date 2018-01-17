@@ -5,6 +5,7 @@ import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { RouterModule, Routes } from '@angular/router';
+import { AsyncLocalStorageModule } from 'angular-async-local-storage';
 
 import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
@@ -34,7 +35,8 @@ const appRoutes: Routes = [
     RouterModule.forRoot(
       appRoutes,
       { enableTracing: true }
-    )
+    ),
+    AsyncLocalStorageModule
   ],
   providers: [
     AuthService,
