@@ -27,12 +27,13 @@
     "angularfire2": "^5.0.0-rc.4",
     "bootstrap": "^3.3.7",
     "core-js": "^2.4.1",
+    "express": "^4.16.2",
     "firebase": "^4.8.2",
     "rxjs": "^5.5.6",
     "typescript": "~2.5.3",
     "zone.js": "^0.8.19"
-  },
-  "devDependencies": {
+},
+"devDependencies": {
     "@angular/cli": "1.6.4",
     "@angular/compiler-cli": "^5.1.0",
     "@angular/language-service": "^5.1.0",
@@ -54,7 +55,7 @@
     "ts-node": "~3.2.0",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3"
-  },
+},
     "engines": {
         "node": "6.4.0",
         "npm": "3.10.3"
