@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { Piece, Square } from '../../models/models';
 import { Observable } from 'rxjs/Observable';
+import { log } from 'util';
 
 @Injectable()
 export class GameService {
 
   constructor(private db: AngularFireDatabase) { }
 
-  // !!!!!!!!!! use filter on for loops that have if's
   setPlayer1(key, uid) {
     const pieceCount = 8;
     for (let i = 0; i < pieceCount; i++) {
@@ -39,11 +39,7 @@ export class GameService {
     let index = 0;
     for (let x = 0; x < row; x++) {
       for (let y = 0; y < row; y++) {
-        const square = new Square({
-          index: index,
-          x: x,
-          y: y
-        });
+        const square = new Square(x, y, index);
         squares.push(square);
         index++;
       }
@@ -83,84 +79,41 @@ export class GameService {
   }
 
   getTakenSquares(currentPiece, allPieces) {
-    const takenSquares = [];
-    for (const id in allPieces) {
-      if (allPieces[id].x === currentPiece.x && allPieces[id].y === currentPiece.y) { } else {
-        takenSquares.push({
-          x: allPieces[id].x,
-          y: allPieces[id].y,
-          player: allPieces[id].color
-        });
+    const takenSquares = allPieces.filter((piece) => {
+      if (!(piece.x === currentPiece.x && piece.y === currentPiece.y)) {
+        return {
+          x: piece.x,
+          y: piece.y,
+          player: piece.color
+        };
       }
-    }
+    });
     return takenSquares;
   }
 
   getCurrentSquare(board, currentPiece) {
-    let currentSquare;
-    for (const key in board) {
-      if (currentPiece.x === board[key].y && currentPiece.y === board[key].x) {
-        currentSquare = board[key];
-      }
-    }
+    const currentSquare = board.find(square => currentPiece.x === square.y && currentPiece.y === square.x);
     return currentSquare;
   }
 
-  getRegularMove({
-    board, move, takenSquares
-  }) {
-    for (const key in board) {
-      if (move.index === board[key].index) {
-        for (let i = 0; i < takenSquares.length; i++) {
-          if (move.x === takenSquares[i].y && move.y === takenSquares[i].x) { } else {
-            return board[key];
-          }
-        }
-      }
-    }
+  getRegularMove({board, move, takenSquares}) {
+
+    const square = board.find(s => s.index === move.index);
+    const isMoveFree = !(takenSquares.some(s => move.x === s.y && move.y === s.x));
+    return isMoveFree ? square : undefined;
   }
 
-  getJumpMove({
-    board, jumpMove, move, takenSquares, oppositePlayer
-  }) {
-    for (const key in board) {
-      if (jumpMove.index === board[key].index) {
-        for (let i = 0; i < takenSquares.length; i++) {
-          if (move.x === takenSquares[i].y && move.y === takenSquares[i].x) {
-            if (takenSquares[i].player === oppositePlayer) {
-              if (jumpMove.x === takenSquares[i].y && jumpMove.y === takenSquares[i].y) { } else {
-                const jumpChoice = board[key];
-                return jumpChoice;
-              }
-            }
-          }
-        }
-      }
-    }
+  getJumpMove({board, jumpMove, move, takenSquares, player}) {
+    const square = board.find(s => s.index === jumpMove.index);
+    const isOppositePlayerInSquare = takenSquares.some(s =>
+      (move.x === s.y && move.y === s.x) && (s.player !== player)
+    );
+    const isJumpSquareFree = !(takenSquares.some(s => jumpMove.x === s.y && jumpMove.y === s.y));
+    return isOppositePlayerInSquare && isJumpSquareFree ? square : undefined;
   }
 
-  getKingJumpMove({
-    board, takenSquares, move, jumpMove, player
-  }) {
-    for (const key in board) {
-      if (jumpMove.index === board[key].index) {
-        for (let i = 0; i < takenSquares.length; i++) {
-          if (move.x === takenSquares[i].y && move.y === takenSquares[i].x) {
-            if (takenSquares[i].player !== player) {
-              if (jumpMove.x === takenSquares[i].y && jumpMove.y === takenSquares[i].y) { } else {
-                const jumpChoice = board[key];
-                return jumpChoice;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
 
-  getKingPiece({
-    currentPiece, player, number, square, gameId
-  }) {
+  getKingPiece({currentPiece, player, number, square, gameId}) {
     if (currentPiece.color === player && square.x === number) {
       this.db.object(`${gameId}/${currentPiece.id}`).update({
         king: true
@@ -168,47 +121,22 @@ export class GameService {
     }
   }
 
-  removePiece({
-    pieces, squareX, squareY, currentPiece, gameId, player1, player2
-  }) {
+  removePiece({pieces, squareX, squareY, currentPiece, gameId, player1, player2}) {
     const pieceToRemove = pieces.find(piece => piece.y === squareX && piece.x === squareY);
-    console.log('piece to remove', pieceToRemove);
-    console.log('current piece', currentPiece);
     this.db.object(`${gameId}/${pieceToRemove.id}`).remove();
-        if (currentPiece.color === 'red') {
-          this.db.object(`games/${gameId}/`).update({
-            player2Death: player2 + 1
-          });
-        } else {
-          this.db.object(`games/${gameId}/`).update({
-            player1Death: player1 + 1
-          });
-        }
-
-    // for (const key in pieces) {
-    //   if (pieces[key].y === squareX && pieces[key].x === squareY) {
-    //     this.db.object(`/${gameId}/${key}`).remove();
-    //     if (currentPiece.color === 'red') {
-    //       this.db.object(`games/${gameId}/`).update({
-    //         player2Death: player2 + 1
-    //       });
-    //     } else {
-    //       this.db.object(`games/${gameId}/`).update({
-    //         player1Death: player1 + 1
-    //       });
-    //     }
-    //   }
-    // }
+    if (currentPiece.color === 'red') {
+      this.db.object(`games/${gameId}/`).update({
+        player2Death: player2 + 1
+      });
+    } else {
+      this.db.object(`games/${gameId}/`).update({
+        player1Death: player1 + 1
+      });
+    }
   }
 
   getMessages(gameId) {
-    return this.db.list('messages', ref => ref.orderByChild('gameId').equalTo(gameId)).valueChanges().map(messages => {
-      return messages.map(message => {
-        const id = message['payload'].key;
-        const data = { id, ...message['payload'].val() };
-        return data;
-      });
-    });
+    return this.db.list('messages', ref => ref.orderByChild('gameId').equalTo(gameId)).valueChanges();
   }
 
   sendMessage(data) {

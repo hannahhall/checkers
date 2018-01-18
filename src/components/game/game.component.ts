@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { GameService, AuthService } from '../../providers/providers';
-import { Piece, Move } from '../../models/models';
+import { Piece, Square } from '../../models/models';
 import { Subscription } from 'rxjs/Subscription';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AsyncLocalStorage } from 'angular-async-local-storage';
@@ -26,19 +26,20 @@ export class GameComponent implements OnInit, OnDestroy {
   userId: string;
   gameId: string;
   pieces: Piece[];
-  messages = {};
+  messages = [];
   board = this.gameService.setSquares();
   usableSquares;
   heading = 'Checkers';
   currentPiece: Piece;
-  choice1: Move;
-  choice2: Move;
-  choice3: Move;
-  choice4: Move;
-  jumpChoice1: Move;
-  jumpChoice2: Move;
-  jumpChoice3: Move;
-  jumpChoice4: Move;
+  choices: Square[] = [];
+  choice1: Square;
+  choice2: Square;
+  choice3: Square;
+  choice4: Square;
+  jumpChoice1: Square;
+  jumpChoice2: Square;
+  jumpChoice3: Square;
+  jumpChoice4: Square;
   gameSub: Subscription;
   messagesSub: Subscription;
   localSub: Subscription;
@@ -62,9 +63,7 @@ export class GameComponent implements OnInit, OnDestroy {
       this.userId = user.uid;
       return this.route.params;
     }).subscribe((params) => {
-      console.log(params);
       this.gameId = params['value'].gid;
-      console.log('gameId', this.gameId);
       this.gameSub = this.gameService.getGame(this.gameId).subscribe(res => {
         this.turn = res['turn'];
         this.player1Id = res['player1'];
@@ -98,16 +97,6 @@ export class GameComponent implements OnInit, OnDestroy {
     return (oddX ^ oddY);
   }
 
-
-  toggleTurn(): boolean {
-    // determines who's turn it is
-    if (this.turn === this.userId) {
-      // console.log('is this doing anything');
-      return true;
-    }
-    return false;
-  }
-
   removeSelected() {
     // function to reset player moves
     this.currentPiece = null;
@@ -119,6 +108,7 @@ export class GameComponent implements OnInit, OnDestroy {
     this.jumpChoice2 = null;
     this.jumpChoice3 = null;
     this.jumpChoice4 = null;
+    this.choices = [];
     try {
       document.getElementsByClassName('selected')[0].classList.remove('selected');
     } catch { }
@@ -132,22 +122,14 @@ export class GameComponent implements OnInit, OnDestroy {
       this.currentPiece.id = id;
       const currentSquare = this.gameService.getCurrentSquare(this.usableSquares, piece);
       const takenSquares = this.gameService.getTakenSquares(this.currentPiece, this.pieces);
-      const move1 = new Move(currentSquare.x + 1, currentSquare.y + 1, currentSquare.index + 9);
-      const move2 = new Move(currentSquare.x + 1, currentSquare.y - 1, currentSquare.index + 7);
-      const jumpMove1 = new Move(currentSquare.x + 2, currentSquare.y + 2, currentSquare.index + 18);
-      const jumpMove2 = new Move(currentSquare.x + 2, currentSquare.y - 2, currentSquare.index + 14);
-      const move3 = new Move(currentSquare.x - 1, currentSquare.y - 1, currentSquare.index - 9);
-      const move4 = new Move(currentSquare.x - 1, currentSquare.y + 1, currentSquare.index - 7);
-      const jumpMove3 = new Move(currentSquare.x - 2, currentSquare.y - 2, currentSquare.index - 18);
-      const jumpMove4 = new Move(currentSquare.x - 2, currentSquare.y + 2, currentSquare.index - 14);
-      // const move1 = new player1Moves.Move1(currentSquare.x, currentSquare.y, currentSquare.index);
-      // const move2 = new player1Moves.Move2(currentSquare.x, currentSquare.y, currentSquare.index);
-      // const move3 = new player2Moves.Move1(currentSquare.x, currentSquare.y, currentSquare.index);
-      // const move4 = new player2Moves.Move2(currentSquare.x, currentSquare.y, currentSquare.index);
-      // const jumpMove1 = new player1Moves.JumpMove1(currentSquare.x, currentSquare.y, currentSquare.index);
-      // const jumpMove2 = new player1Moves.JumpMove2(currentSquare.x, currentSquare.y, currentSquare.index);
-      // const jumpMove3 = new player2Moves.JumpMove1(currentSquare.x, currentSquare.y, currentSquare.index);
-      // const jumpMove4 = new player2Moves.JumpMove2(currentSquare.x, currentSquare.y, currentSquare.index);
+      const move1 = new Square(currentSquare.x + 1, currentSquare.y + 1, currentSquare.index + 9);
+      const move2 = new Square(currentSquare.x + 1, currentSquare.y - 1, currentSquare.index + 7);
+      const jumpMove1 = new Square(currentSquare.x + 2, currentSquare.y + 2, currentSquare.index + 18);
+      const jumpMove2 = new Square(currentSquare.x + 2, currentSquare.y - 2, currentSquare.index + 14);
+      const move3 = new Square(currentSquare.x - 1, currentSquare.y - 1, currentSquare.index - 9);
+      const move4 = new Square(currentSquare.x - 1, currentSquare.y + 1, currentSquare.index - 7);
+      const jumpMove3 = new Square(currentSquare.x - 2, currentSquare.y - 2, currentSquare.index - 18);
+      const jumpMove4 = new Square(currentSquare.x - 2, currentSquare.y + 2, currentSquare.index - 14);
 
       this.choice1 = this.gameService.getRegularMove({
         board: this.usableSquares,
@@ -169,54 +151,57 @@ export class GameComponent implements OnInit, OnDestroy {
         takenSquares: takenSquares,
         move: move4
       });
-      this.jumpChoice1 = this.gameService.getKingJumpMove({
+      this.jumpChoice1 = this.gameService.getJumpMove({
         board: this.usableSquares,
         takenSquares: takenSquares,
         move: move1,
         jumpMove: jumpMove1,
         player: this.playerColor
       });
-      this.jumpChoice2 = this.gameService.getKingJumpMove({
+      this.jumpChoice2 = this.gameService.getJumpMove({
         board: this.usableSquares,
         takenSquares: takenSquares,
         move: move2,
         jumpMove: jumpMove2,
         player: this.playerColor
       });
-      this.jumpChoice3 = this.gameService.getKingJumpMove({
+      this.jumpChoice3 = this.gameService.getJumpMove({
         board: this.usableSquares,
         takenSquares: takenSquares,
         move: move3,
         jumpMove: jumpMove3,
         player: this.playerColor
       });
-      this.jumpChoice4 = this.gameService.getKingJumpMove({
+      this.jumpChoice4 = this.gameService.getJumpMove({
         board: this.usableSquares,
         takenSquares: takenSquares,
         move: move4,
         jumpMove: jumpMove4,
         player: this.playerColor
       });
+      this.choices.push(...[
+        this.choice1,
+        this.choice2,
+        this.choice3,
+        this.choice4,
+        this.jumpChoice1,
+        this.jumpChoice2,
+        this.jumpChoice3,
+        this.jumpChoice4
+      ]);
     }
   }
 
   choosePiecePlayer1 = (e, piece, id) => {
-    console.log('click', e);
-    // when player 1 chooses a piece this function is called
     if (this.turn === piece.userId) {
       e.currentTarget.classList.add('selected');
       this.currentPiece = piece;
       const currentSquare = this.gameService.getCurrentSquare(this.usableSquares, piece);
       const takenSquares = this.gameService.getTakenSquares(this.currentPiece, this.pieces);
-      const move1 = new Move(currentSquare.x + 1, currentSquare.y + 1, currentSquare.index + 9);
-      const move2 = new Move(currentSquare.x + 1, currentSquare.y - 1, currentSquare.index + 7);
-      const jumpMove1 = new Move(currentSquare.x + 2, currentSquare.y + 2, currentSquare.index + 18);
-      const jumpMove2 = new Move(currentSquare.x + 2, currentSquare.y - 2, currentSquare.index + 14);
-      // move1 = new player1Moves.Move1(currentSquare.x, currentSquare.y, currentSquare.index),
-      // move2 = new player1Moves.Move2(currentSquare.x, currentSquare.y, currentSquare.index),
-      // jumpMove1 = new player1Moves.JumpMove1(currentSquare.x, currentSquare.y, currentSquare.index),
-      // jumpMove2 = new player1Moves.JumpMove2(currentSquare.x, currentSquare.y, currentSquare.index);
-
+      const move1 = new Square(currentSquare.x + 1, currentSquare.y + 1, currentSquare.index + 9);
+      const move2 = new Square(currentSquare.x + 1, currentSquare.y - 1, currentSquare.index + 7);
+      const jumpMove1 = new Square(currentSquare.x + 2, currentSquare.y + 2, currentSquare.index + 18);
+      const jumpMove2 = new Square(currentSquare.x + 2, currentSquare.y - 2, currentSquare.index + 14);
       this.choice1 = this.gameService.getRegularMove({
         board: this.usableSquares,
         move: move1,
@@ -232,15 +217,16 @@ export class GameComponent implements OnInit, OnDestroy {
         jumpMove: jumpMove1,
         move: move1,
         takenSquares: takenSquares,
-        oppositePlayer: 'white'
+        player: this.playerColor
       });
       this.jumpChoice2 = this.gameService.getJumpMove({
         board: this.usableSquares,
         jumpMove: jumpMove2,
         move: move2,
         takenSquares: takenSquares,
-        oppositePlayer: 'white'
+        player: this.playerColor
       });
+      this.choices.push(...[this.choice1, this.choice2, this.jumpChoice1, this.jumpChoice2]);
     }
   }
 
@@ -251,10 +237,10 @@ export class GameComponent implements OnInit, OnDestroy {
       this.currentPiece = piece;
       const currentSquare = this.gameService.getCurrentSquare(this.usableSquares, piece);
       const takenSquares = this.gameService.getTakenSquares(this.currentPiece, this.pieces);
-      const move1 = new Move(currentSquare.x - 1, currentSquare.y - 1, currentSquare.index - 9);
-      const move2 = new Move(currentSquare.x - 1, currentSquare.y + 1, currentSquare.index - 7);
-      const jumpMove1 = new Move(currentSquare.x - 2, currentSquare.y - 2, currentSquare.index - 18);
-      const jumpMove2 = new Move(currentSquare.x - 2, currentSquare.y + 2, currentSquare.index - 14);
+      const move1 = new Square(currentSquare.x - 1, currentSquare.y - 1, currentSquare.index - 9);
+      const move2 = new Square(currentSquare.x - 1, currentSquare.y + 1, currentSquare.index - 7);
+      const jumpMove1 = new Square(currentSquare.x - 2, currentSquare.y - 2, currentSquare.index - 18);
+      const jumpMove2 = new Square(currentSquare.x - 2, currentSquare.y + 2, currentSquare.index - 14);
 
       this.choice1 = this.gameService.getRegularMove({
         board: this.usableSquares,
@@ -271,28 +257,22 @@ export class GameComponent implements OnInit, OnDestroy {
         jumpMove: jumpMove1,
         move: move1,
         takenSquares: takenSquares,
-        oppositePlayer: 'red'
+        player: this.playerColor
       });
       this.jumpChoice4 = this.gameService.getJumpMove({
         board: this.usableSquares,
         jumpMove: jumpMove2,
         move: move2,
         takenSquares: takenSquares,
-        oppositePlayer: 'red'
+        player: this.playerColor
       });
+      this.choices.push(...[this.choice1, this.choice2, this.jumpChoice3, this.jumpChoice4]);
     }
   }
 
   chooseSquare(square) {
     // if the square choosen matches any of the possible moves the player has
-    if (square === this.choice1 ||
-      square === this.choice2 ||
-      square === this.choice3 ||
-      square === this.choice4 ||
-      square === this.jumpChoice1 ||
-      square === this.jumpChoice2 ||
-      square === this.jumpChoice3 ||
-      square === this.jumpChoice4) {
+    if (this.choices.includes(square)) {
       const newTop = (square.x * 70) + 'px';
       const newLeft = (square.y * 70) + 'px';
       const url = `${this.gameId}/${this.currentPiece.id}`;
