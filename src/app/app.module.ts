@@ -13,7 +13,7 @@ import { AuthService, DashboardService, GameService } from '../providers/provide
 import { DashboardComponent, GameComponent, LoginComponent } from '../components/components';
 
 const appRoutes: Routes = [
-  { path: 'dashboard/:uid', component: DashboardComponent },
+  { path: 'dashboard', component: DashboardComponent },
   { path: 'game/:gid', component: GameComponent },
   { path: '', component: LoginComponent },
   { path: '**', component: LoginComponent }

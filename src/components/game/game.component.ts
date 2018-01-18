@@ -374,7 +374,7 @@ export class GameComponent implements OnInit, OnDestroy {
   leaveGame() {
     this.gameService.removePieces(`games/${this.gameId}`);
     this.gameService.removePieces(`${this.gameId}`);
-    this.router.navigate([`dashboard/${this.userId}`]);
+    this.router.navigate([`dashboard/`]);
   }
 
   logOut() {

@@ -3,6 +3,7 @@ import { OnDestroy } from '@angular/core';
 import { DashboardService, AuthService, GameService } from '../../providers/providers';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
+import { AsyncLocalStorage } from 'angular-async-local-storage';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,28 +17,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
   heading = 'Dashboard';
   games: any;
 
-  routeSub: Subscription;
-  userSub: Subscription;
+  localSub: Subscription;
   gameSub: Subscription;
 
   constructor(
     public dashService: DashboardService,
     public authService: AuthService,
-    private route: ActivatedRoute,
     public gameService: GameService,
-    private router: Router) {
+    private router: Router,
+    protected localStorage: AsyncLocalStorage) { }
+
+  ngOnInit() {
     this.gameSub = this.dashService.getGames().subscribe((res) => {
       this.games = res;
     });
-  }
-
-  ngOnInit() {
-    this.routeSub = this.route.params.subscribe((res) => {
-      this.uid = res['uid'];
-      this.userSub = this.dashService.getUser(this.uid).subscribe((user) => {
-        const index = user['email'].indexOf('@');
-        this.userEmail = user['email'].slice(0, index);
-      });
+    this.localSub = this.localStorage.getItem('currentUser').subscribe((user) => {
+      this.userEmail = user.email;
+      this.uid = user.uid;
     });
   }
 
@@ -73,8 +69,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.routeSub.unsubscribe();
-    this.userSub.unsubscribe();
+    this.localSub.unsubscribe();
     this.gameSub.unsubscribe();
   }
 
