@@ -4,6 +4,7 @@ import { DashboardService, AuthService, GameService } from '../../providers/prov
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import { AsyncLocalStorage } from 'angular-async-local-storage';
+import { log } from 'util';
 
 @Component({
   selector: 'app-dashboard',
@@ -60,7 +61,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     };
     this.dashService.joinGame(gameId, player2).then((res) => {
       this.gameService.setPlayer2(gameId, this.uid);
-      this.router.navigate([`game/${gameId}`])
+      this.router.navigate([`game/${gameId}`]);
     }, err => console.log('Error in join game', err));
   }
 

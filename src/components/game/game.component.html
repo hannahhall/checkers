@@ -8,8 +8,8 @@
     </div>
     <div class="gameNavBar">
         <h1 class="gameHead">Checkers</h1>
-        <button type="button" (click)="leaveGame()" class="btn btn-default gameBtn btnLeft">Leave Game</button>
-        <button type="submit" (click)="logOut()" class="btn btn-default gameBtn">Logout</button>
+        <button type="button" (click)="leaveGame()" class="gameBtn btnLeft">Leave Game</button>
+        <button type="submit" (click)="logOut()" class="gameBtn">Logout</button>
         <a href="https://github.com/hannahhall/checkers" target="_blank" class="github">
             <img src="assets/img/GitHub-Mark-Light-32px.png" alt="GitHub Link">
         </a>
@@ -42,11 +42,11 @@
             <div class="messageArea">
                 <p *ngFor="let message of messages">{{message.userEmail}}: {{message.userMessage}}</p>
             </div>
-            <form class="form-inline messageInput">
-                <div class="form-group">
-                    <input type="text" name="message" value="" class="form-control" placeholder="Enter message here:" [(ngModel)]="message">
-                    <input type="submit" name="" class="btn btn-default messageBtn" (click)="submitMessage()">
-                </div>
+            <form class="messageInput">
+                
+                    <input type="text" name="message" value="" class="" placeholder="Enter message here:" [(ngModel)]="message">
+                    <button type="submit" name="" class="messageBtn" (click)="submitMessage()">Submit</button>
+                
             </form>
         </div>
     </div>

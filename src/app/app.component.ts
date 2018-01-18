@@ -17,8 +17,9 @@ export class AppComponent {
     this.afAuth.authState.subscribe((user) => {
       if (user) {
         const currentUser = { email: user.email, uid: user.uid };
-        this.localStorage.setItem('currentUser', currentUser).subscribe();
-        this.router.navigate([`dashboard`]);
+        this.localStorage.setItem('currentUser', currentUser).subscribe(() => {
+          this.router.navigate([`dashboard`]);
+        });
       } else {
         this.localStorage.removeItem('currentUser').subscribe();
         this.router.navigate(['']);
