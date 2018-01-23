@@ -6,11 +6,11 @@
 export const environment = {
   production: false,
   firebase: {
-    apiKey: 'AIzaSyBrbaIJrMqiL1Ho_rM35FgieqOyAjF-BiE',
-    authDomain: 'checkers-f4624.firebaseapp.com',
-    databaseURL: 'https://checkers-f4624.firebaseio.com',
-    projectId: 'checkers-f4624',
-    storageBucket: 'checkers-f4624.appspot.com',
-    messagingSenderId: '620605328425'
+    apiKey: "AIzaSyCkUNfoL-zdi9xHz7Rz_l98LGgAx1_5a50",
+    authDomain: "realtime-598ea.firebaseapp.com",
+    databaseURL: "https://realtime-598ea.firebaseio.com",
+    projectId: "realtime-598ea",
+    storageBucket: "realtime-598ea.appspot.com",
+    messagingSenderId: "668427691584"
   }
 };
